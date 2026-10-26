@@ -1,0 +1,141 @@
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  passwordHash String
+  role        String
+  status      String    @default("pending")
+  verified    Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  audits Audit[]
+  claimsAssigned ClaimAssignment[]
+  claimNotes     Note[]
+}
+
+model Role {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  scope     String
+  permissions String // JSON or comma-separated; expand to normalized table later
+  createdAt DateTime @default(now())
+}
+
+model Customer {
+  id          String @id @default(uuid())
+  userId      String @unique
+  name        String
+  organization String?
+  createdAt   DateTime @default(now())
+
+  vehicles Vehicle[]
+  claims   Claim[]
+}
+
+model Vehicle {
+  id         String @id @default(uuid())
+  customerId String
+  make       String
+  model      String
+  year       Int
+  vin        String?
+  customer   Customer @relation(fields: [customerId], references: [id])
+  claims     Claim[]
+}
+
+model Claim {
+  id            String @id @default(uuid())
+  claimNumber   String @unique
+  customerId    String
+  vehicleId     String
+  status        String @default("submitted")
+  priority      String @default("normal")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  customer Customer @relation(fields: [customerId], references: [id])
+  vehicle  Vehicle  @relation(fields: [vehicleId], references: [id])
+  inspections Inspection[]
+  assignments ClaimAssignment[]
+  notes     Note[]
+  estimates Estimate[]
+}
+
+model Inspection {
+  id          String @id @default(uuid())
+  claimId     String
+  inspectorId String @default("unassigned")
+  status      String @default("scheduled")
+  checklistData String? // structured JSON
+  notes       String?
+  createdAt   DateTime @default(now())
+  claim       Claim @relation(fields: [claimId], references: [id])
+  evidence    Evidence[]
+}
+
+model Evidence {
+  id           String @id @default(uuid())
+  inspectionId String
+  filePath     String // /uploads/claims/{claimId}/filename.avif
+  originalName String
+  thumbnailPath String?
+  optimizedFormat String @default("avif")
+  uploadedAt   DateTime @default(now())
+  inspection   Inspection @relation(fields: [inspectionId], references: [id])
+}
+
+model Estimate {
+  id           String @id @default(uuid())
+  claimId      String
+  version      Int @default(1)
+  itemData     String // JSON array of line items
+  total        Decimal @db.Decimal(12,2)
+  taxConfig    String // JSON with VAT %, NHIL/GETFund %
+  depreciationRules String?
+  status       String @default("draft")
+  createdAt    DateTime @default(now())
+  claim        Claim @relation(fields: [claimId], references: [id])
+}
+
+model Note {
+  id        String @id @default(uuid())
+  claimId   String
+  userId    String
+  content   String
+  isPublic  Boolean @default(true)
+  createdAt DateTime @default(now())
+  claim     Claim @relation(fields: [claimId], references: [id])
+  user      User @relation(fields: [userId], references: [id])
+}
+
+model ClaimAssignment {
+  id         String @id @default(uuid())
+  claimId    String
+  userId     String
+  role       String // inspector, adjuster, etc.
+  assignedAt DateTime @default(now())
+  claim      Claim @relation(fields: [claimId], references: [id])
+  user       User @relation(fields: [userId], references: [id])
+}
+
+model Audit {
+  id         String @id @default(uuid())
+  actorId    String?
+  action     String
+  resource   String
+  resourceId String?
+  context    String? // JSON: scope, requestId
+  outcome    String
+  reason     String?
+  timestamp  DateTime @default(now())
+  user       User? @relation(fields: [actorId], references: [id])
+}

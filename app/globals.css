@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Tailwind v4 CSS-first theme tokens (replaces tailwind.config.js) */
+@theme {
+  /* Base palette used by layouts (bg-background, text-foreground, border-border, ...) */
+  --color-background: #ffffff;
+  --color-foreground: #0f172a;
+  --color-card: #ffffff;
+  --color-border: #e2e8f0;
+  --color-muted-foreground: #64748b;
+
+  /* Brand */
+  --color-brand-50: #f0fdfa;
+  --color-brand-900: #0f766e;
+}
+
+@layer base {
+  html { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f8fafc; }
+}

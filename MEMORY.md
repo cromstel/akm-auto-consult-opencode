@@ -1,0 +1,14 @@
+# Project Memory
+- Product: AKM Auto Consult; developer: CITGROUP.
+- Domain: customers/organizations, vehicles/policies, motor claims, inspections, loss adjustment, repair estimates, evidence, documents, finance, communications and reporting.
+- Required stack: Next.js App Router, MySQL, TypeScript, Tailwind CSS, PostCSS; stable compatible dependencies only.
+- Inbuilt auth + authorization; deny-by-default RBAC with data scope (self, organization, assigned, branch/global).
+- Separate sign-in paths by role group: customer, platform owner, company admin, management, claims, adjuster, inspector, finance, auditor, support.
+- Public registration creates customer accounts only. Staff accounts created/invited by authorized admin/management.
+- Public, customer, and staff portals have distinct layouts. Dashboard header/footer differ from public header/footer. Sidebar is reusable and permission-filtered; API checks remain authoritative.
+- Do not hardcode secrets, product display name, port, DB connection, tax rates or jurisdiction assumptions. App name/URL/port/database/provider settings come from validated environment config.
+- Development and production configuration separated. `.env.local` / `.env.production` ignored; safe examples committed. Production secrets use secret manager.
+- Money calculations decimal-safe; preserve original estimate and separately track adjustment reason/category.
+- Claim flow: intake → triage → assignment → inspection/evidence → estimate/assessment → review/approval → repair/settlement → closure.
+- Agent-plan: M1 scaffold; M2 auth (gate); M3A customer/staff shells + M3B DB + M3C image pipeline; M4 claims (gate); M5 AI; M6 estimates/PDF; M7 deploy (gate). Security rules (deny-by-default, .env separation, DECIMAL, AVIF pipeline, AI audit, no production fixtures) apply at all phases.
+- Open decisions: legal jurisdiction/tax rates, currency, timezone, retention, approval thresholds, hosting, mail/SMS and object storage. Do not guess; configure and confirm.
