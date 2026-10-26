@@ -7,8 +7,8 @@ Orchestration: Parallel (Agent 1/2/3 concurrent) with sequential checkpoints at 
 - [x] Verify stable releases, pin lockfile — Next.js 16.4.3, React 19.3.1, Tailwind 4.3.3 (+@tailwindcss/postcss), sharp 0.35.5, zod 4.6.7, vitest 5.0.5, @types/node 24.19.2, eslint 9.39.5 + eslint-config-next 16.4.3. Prisma held at 5.22.0 (v8 is RC — excluded per no-canary rule). npm audit: 0 vulnerabilities (fixed critical tinypool RCE, high zod DoS, esbuild/vite chain).
 - [x] Scaffold App Router TypeScript, Tailwind v4 CSS-first tokens, strict mode, ESLint 9 flat config, startup env validation (lib/env.ts via instrumentation.ts — fails fast, key names only in errors).
 - [x] .gitignore hardened (.env* with .example templates committed, uploads/, dumps, keys, tsbuildinfo); CI workflow added (.github/workflows/ci.yml: lint/typecheck/test/build/secret scan on Node 24); git repo initialized with all gates green.
-- [ ] Confirm jurisdiction/taxes (VAT 15%; NHIL/GETFund 5% levies), currency, timezone, retention policy, MFA/step-up thresholds, approval limits, storage/mail/hosting.
-Status: IN PROGRESS (3/4 done — remaining item needs business confirmation; production deploy target identified: akmautoconsult.cromstelit.com, Node.js site, runbook in docs/DEPLOYMENT.md)
+- [x] Confirm jurisdiction/taxes — CONFIRMED 2026-10-26: Ghana; VAT 15% + NHIL/GETFund 5% levies; currency GHS, integer minor units (pesewas) only; timezone Africa/Accra; MFA/step-up required for admin/finance actions. (Retention policy + approval limits remain open business details — revisit at Phase 8/9.)
+Status: COMPLETED (all four items done; production deploy ON HOLD per user decision 2026-10-26 — runbook ready in docs/DEPLOYMENT.md, executes only on explicit go)
 
 ## Phase 1 — foundation (Agent 1 + Agent 2 parallel; Agent 3 on quality gates)
 - [ ] Module folders: /claims/, /inspections/, /finances/, /auth/, /docs/, /analytics/; global tokens (Tailwind); light/dark theme toggle in global layout.
