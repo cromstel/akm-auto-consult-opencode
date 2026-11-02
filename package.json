@@ -9,7 +9,11 @@
     "start": "next start",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:db": "dotenv-cli -e .env.local -- vitest run",
     "typecheck": "tsc --noEmit"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.12.0",
@@ -17,6 +21,7 @@
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
+    "server-only": "^0.0.1",
     "sharp": "0.35.5",
     "zod": "4.6.7"
   },

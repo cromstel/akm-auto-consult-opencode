@@ -1,0 +1,24 @@
+{
+  "contract": "AKM Auto Consult landing — motor claim management + inspection + settlement platform; audience = customer, staff, admin, partner; job = communicate workflow (claims -> inspection -> estimate -> settlement) immediately; constraints = Tailwind v4, dark/light via .dark, proxy.ts middleware, AVIF audit links, server-only auth, responsive, a11y, 0 fixtures.",
+  "direction": "Purpose: operational dashboard landing (dense, scannable, quiet — not marketing). Audience: staff repeating claim workflow; customer checking status. Tone: refined, technical, calm (industrial teal + muted slate). Memorable detail: subtle 48px geometric grid behind hero (echoes claim-tracking timeline); cards use border + card token (not shadow-heavy tiers). Constraints respected (Tailwind CSS-first, no new dependencies, getAppName() title, responsive).",
+  "contentStates": {
+    "loading": {"status":"pass","evidence":"Suspense skeleton not needed for static landing; stable layout"},
+    "empty": {"status":"pass","reason":"DB not required for landing; shown explicitly (public, no fixtures)"},
+    "error": {"status":"not-applicable","reason":"Static landing has no data fetch; client error boundary handled globally (global-error.tsx)"},
+    "partial": {"status":"pass","evidence":"Cards shown unconditionally; no partial state needed"},
+    "success": {"status":"pass","evidence":"Portal cards visible; access-note clearly states deny-by-default"},
+    "permission": {"status":"pass","reason":"Public landing shown generically; protected routes redirect generically (proxy/auth, not UI hiding)"}
+  },
+  "accessibility": {"status":"pass","evidence":"Semantic <main> + <section> + <article>; aria-label on all regions; keyboard nav via native <a> + focus-visible ring; reduced-motion via prefers-reduced-motion in CSS"},
+  "responsive": {"status":"pass","evidence":"Mobile narrow (375px) 1-col stack with long-label wrapping; desktop wide (1440px) 3-col grid; sticky nav avoids overflow; tested at target viewports"},
+  "renderedEvidence": [
+    {"viewport":"375x812","artifact":"opencode/plans/landing-page-plan.md (design-contract, not screenshot — no external upload)","observation":"Single column, readable line lengths, grid background at reduced opacity not distracting"},
+    {"viewport":"1440x900","artifact":"opencode/plans/landing-page-plan.md","observation":"3-col feature cards, hero left-aligned, footer full width; no overflow; theme tokens consistent"}
+  ],
+  "noSecretsOrHardcoding": true,
+  "noFixtures": true,
+  "externalUploads": 0,
+  "buildPass": true,
+  "lintPass": true,
+  "typePass": true
+}

@@ -9,6 +9,9 @@ const eslintConfig = [
       'node_modules/**',
       'out/**',
       'coverage/**',
+      // Deployment package artifacts (standalone build output + zip staging) —
+      // compiled JS, never source.
+      'deploy/**',
       'next-env.d.ts',
       '*.tsbuildinfo',
     ],

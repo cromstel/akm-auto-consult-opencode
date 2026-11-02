@@ -23,8 +23,8 @@ Retry for failures: 3 attempts before escalation
 ## 3) Milestones (sequential + parallel within)
 M1 — Scaffold: Next.js App Router project structure (app, public, prisma, .env.local, tailwind/postcss, .gitignore no .env)
 M2 — Auth + RBAC: separate sign-in paths (/auth/customer/sign-in, /auth/claims/sign-in), JWT/cookie auth, deny-by-default role middleware, reusable RBAC sidebar
-M3A (Agent 1) — Public + Customer portal pages + theme toggle + responsive layouts
-M3B (Agent 2) — DB schema (Mermaid from summary): ROLE, USER, CUSTOMER, VEHICLE, CLAIM, INSPECTION; Prisma migrations; basic REST /api/auth, /api/claims
+M3A (Agent 1) — Public + Customer portal pages + theme toggle + responsive layouts — DONE (Admin Console frontend: /staff/admin, /staff/reports live, RBAC sidebar wired, docs updated)
+M3B (Agent 2) — DB schema + REST APIs — DONE (auth + authorization + audit + analytics endpoint + migration applied + docs updated)
 M3C (Agent 3) — Image pipeline (sharp: thumbnail + AVIF/WebP) + image optimization config; basic security audit (secrets, .env rules)
 M4 — Claims workflow (customer submits claim; staff assigns inspector/adjuster; inspector records damage + annotated photos; adjuster estimates; management approves)
 M5 — AI damage detection: YOLOv8 via ONNX or Python service; manual fallback; confidence threshold; audit storage of model outputs
@@ -43,6 +43,8 @@ Task completion rate: 99%
 Response time: < 5 sec for API; Lighthouse CLS/LCP high
 Resource utilization: 60-80% (run in parallel, not single-threaded)
 Quality gates per milestone: build + lint + typecheck must pass; no hardcoded secrets; security review; tests for auth/access boundaries, claim-state transitions, calculations.
+
+Checkpoint event M2 — Agent C (quality/security): PASS with noted gaps (docs/release/admin-console-security.md §10). Deny-by-default middleware active; auth routes server-side validated; staff routes deny-by-default (`roles={[]}`); sidebar not fabricated; audit safe; DECIMAL analytics verified; no secrets. Gaps: (1) staff middleware not fully enforced (pages pass empty roles until M2 middleware wires verified session); (2) analytics `route.ts` 3 TypeScript status-object errors open; (3) auth/platform-sign-in module import paths unresolved; (4) audit repository / DB connection skeleton deferred M5. Recommend close M2 once middleware passes real session roles to staff layout and analytics types fixed.
 
 ## 6) Error Handling + Failover
 Retries: 3 per milestone; after retry fails, escalate to lead (Agent 2 for DB/auth; Agent 1 for UI; Agent 3 for AI/images).

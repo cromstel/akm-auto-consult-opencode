@@ -1,24 +1,35 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Next.js 16 convention: proxy.ts (renamed from middleware.ts); named `proxy` export.
-// Deny-by-default optimistic guard ONLY — real session validation and role checks
-// happen server-side in route handlers/pages (proxy is not an authorization layer).
+/**
+ * Next 16 convention: proxy.ts (replaces middleware.ts). Deny-by-default for
+ * protected routes; propagates x-request-id; passes session cookie through.
+ * Full session verification is handled server-side (auth service) per
+ * docs/security/SECURITY_RBAC.md.
+ */
+const PROTECTED = ['/customer', '/staff', '/claims', '/admin', '/auth/'];
 
 export function proxy(req: NextRequest) {
+  const requestId = req.headers.get('x-request-id') ?? crypto.randomUUID();
   const path = req.nextUrl.pathname;
+  const isProtected = PROTECTED.some((p) => path.startsWith(p));
 
-  // Protected areas: require a session cookie before entering; otherwise redirect.
-  if (path.startsWith('/customer') || path.startsWith('/staff') || path.startsWith('/claims/')) {
+  const headers = new Headers(req.headers);
+  headers.set('x-request-id', requestId);
+
+  let response: NextResponse;
+  if (isProtected) {
     const sessionCookie = req.cookies.get('session');
-    if (!sessionCookie) {
-      return NextResponse.redirect(new URL('/auth/customer/sign-in', req.url));
-    }
+    response = sessionCookie
+      ? NextResponse.next({ request: { headers } })
+      : NextResponse.redirect(new URL('/auth/customer/sign-in', req.url));
+  } else {
+    response = NextResponse.next({ request: { headers } });
   }
-
-  return NextResponse.next();
+  response.headers.set('x-request-id', requestId);
+  return response;
 }
 
 export const config = {
-  matcher: ['/customer/:path*', '/staff/:path*', '/claims/:path*', '/api/claims/:path*', '/api/inspections/:path*'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

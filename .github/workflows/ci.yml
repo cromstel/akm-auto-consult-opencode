@@ -8,9 +8,6 @@ on:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    env:
-      # Dummy value: prisma generate and next build do not connect to a database.
-      DATABASE_URL: mysql://ci_user:ci_dummy@127.0.0.1:3306/ci_dummy
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,6 +23,10 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+        env:
+          # Step-scoped: prisma generate never connects; tests intentionally
+          # run without DATABASE_URL so DB-bound integration tests skip in CI.
+          DATABASE_URL: mysql://ci_user:ci_dummy@127.0.0.1:3306/ci_dummy
 
       - name: Lint
         run: npm run lint
@@ -38,6 +39,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          APP_NAME: AKM Auto Consult
 
       - name: Secret scan
         uses: gitleaks/gitleaks-action@v2

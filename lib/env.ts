@@ -9,14 +9,12 @@ import { z } from 'zod';
  *
  * Rules:
  * - DATABASE_URL is always required and must be a mysql:// connection string.
- * - AUTH_SESSION_SECRET is required in production (>= 32 chars). In
- *   development it is validated if present; sessions are skeleton-only until
- *   the M2 auth service is fully wired.
+ * - AUTH_SESSION_SECRET is required in production (>= 32 chars).
  */
 const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  APP_NAME: z.string().min(1).default('AKM Auto Consult'),
-  APP_URL: z.string().url().default('http://localhost:3000'),
+  APP_NAME: z.string().min(1).optional(),
+  APP_URL: z.url().optional(),
   DATABASE_URL: z
     .string()
     .min(1)
@@ -52,4 +50,20 @@ export function validateEnv(): Env {
   }
 
   return parsed.data;
+}
+
+/**
+ * Non-throwing accessors for display config (brand name, base URL).
+ *
+ * These are safe to call during static prerender at build time, unlike
+ * validateEnv(), which runs only at server startup via instrumentation.
+ * The product display name must come from validated environment config,
+ * never from a hardcoded literal.
+ */
+export function getAppName(): string {
+  return process.env.APP_NAME?.trim() || 'App';
+}
+
+export function getAppUrl(): string {
+  return process.env.APP_URL?.trim() || 'http://localhost:3000';
 }

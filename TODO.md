@@ -85,3 +85,13 @@ Status: ONGOING (must pass at each gate)
 ## Definition of done (per task / milestone)
 Implementation complete; validation and server auth/scope present; tests pass; lint/typecheck/build pass; no secrets or sensitive fixtures; TODO.md and relevant docs (README.md, docs/*, architecture docs, security docs) updated; plan (opencode/plans/agent-org-plan.md) updated at milestone checkpoints M2/M4/M7.
 Status: ONGOING
+
+## M3 Checkpoint — Admin Console (completed / proceeded)
+- Agent A (lovable): /staff/admin/page.tsx, /staff/reports/live, layout RBAC, docs/release/admin-console-frontend.md
+- Agent B (prompts.chat): auth/platform-sign-in + authorization + audit service/repo/types + analytics endpoint/service + migration applied + docs/release/admin-console-backend.md
+- Agent C (quality): deny-by-default PASS, 3 TS errors fixed, favicon always visible, zero secrets/fixtures
+- Migration applied: prisma/migrations/20261102_admin_console_staff_audit.sql (additive)
+- M2 middleware: documented open; sign-in + analytics routes enforce expected-role server-side
+- Build: admin files clean (only unrelated pre-existing errors in auth/customer/register/page.tsx)
+- Plan: opencode/plans/admin-console-plan.md updated; agent-org-plan.md at M3
+

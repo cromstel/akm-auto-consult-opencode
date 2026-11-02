@@ -1,0 +1,23 @@
+// Admin console backend — schema additions (documentary; apply via migration after review).
+// Not applied to base schema.prisma automatically; merge after M2 sign-off.
+
+model StaffProvisioning {
+  id        String   @id @default(uuid())
+  createdBy String
+  role      String
+  scope     String   @default("branch")
+  status    String   @default("pending")
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SessionRole {
+  id        String   @id @default(uuid())
+  userId    String
+  role      String
+  scope     String   @default("self")
+  issuedAt  DateTime @default(now())
+  expiresAt DateTime?
+  revoked   Boolean  @default(false)
+}

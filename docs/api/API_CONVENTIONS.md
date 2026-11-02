@@ -24,5 +24,7 @@ Finance: `GET/POST /claims/{id}/invoices`, `GET/PATCH /invoices/{id}`, `POST /in
 
 Reports/admin: `GET /reports/claims`, `POST /reports/exports`, `GET /reports/exports/{jobId}`, `GET/PATCH /admin/settings`, `GET /audit-events`, `/health/live`, `/health/ready`.
 
+Phase 3 additions (2026-10-26): `POST /api/v1/evidence` (AVIF pipeline + audit link), `PATCH /api/v1/claims/{id}` (transition guard enforced server-side). Smoke pre-deploy script: `docs/deploy/smoke-checks.ts` (not executed against production until "execute deploy" confirmed). Deploy deferred per user.
+
 ## Invariants
 Do not accept user/role/org/approver/totals/status as authoritative client fields. Server computes money and workflow. Critical mutations use reason and idempotency as required. OpenAPI should derive from actual schemas and stay current.
