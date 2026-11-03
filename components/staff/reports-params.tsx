@@ -42,8 +42,8 @@ export default function ReportsClient() {
         meta: body.meta || { requestId: '', generatedAt: new Date().toISOString() },
         audit: body.audit,
       });
-    } catch (e: any) {
-      setError(String(e?.message || e));
+    } catch (e: unknown) {
+      setError((e as Error)?.message || String(e));
     } finally {
       setLoading(false);
     }

@@ -9,17 +9,6 @@ import type { NextRequest } from 'next/server';
 import { verifySessionToken } from '@/lib/auth/auth.service';
 import { denyByDefault, type RoleFamily, type Scope, type AuthContext } from '@/lib/authorization/authorization';
 
-/** Supported staff route families — must match authorization.ts. */
-const STAFF_ROLES: Record<string, RoleFamily> = {
-  staff: 'admin',          // staff portal defaults to admin family
-  admin: 'admin',
-  analytics: 'admin',
-  claims: 'claims_officer',
-  finance: 'finance',
-  inspections: 'inspector',
-  reports: 'auditor',
-};
-
 /** Extract AuthContext from request cookie securely. */
 function buildAuthContext(req: NextRequest, token: string): AuthContext | null {
   const payload = verifySessionToken(token);

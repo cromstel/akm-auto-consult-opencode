@@ -39,6 +39,8 @@ model Permission {
   category     String
   description  String?
   roles        RolePermission[]
+
+  @@map("permissions")
 }
 
 model RolePermission {
@@ -48,6 +50,7 @@ model RolePermission {
   role         Role       @relation(fields: [roleId], references: [id])
 
   @@id([permissionId, roleId])
+  @@map("role_permissions")
   @@index([roleId])
 }
 

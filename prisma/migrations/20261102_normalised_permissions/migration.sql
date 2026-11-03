@@ -41,10 +41,10 @@ CREATE TABLE IF NOT EXISTS permissions (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS role_permissions (
-  permissionId VARCHAR(36) NOT NULL,
-  roleId VARCHAR(36) NOT NULL,
+  permissionId VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci NOT NULL,
+  roleId VARCHAR(36) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (permissionId, roleId),
   KEY idx_rp_role (roleId),
   CONSTRAINT fk_rp_permission FOREIGN KEY (permissionId) REFERENCES permissions(id) ON DELETE CASCADE,
-  CONSTRAINT fk_rp_role FOREIGN KEY (roleId) REFERENCES roles(id) ON DELETE CASCADE
+  CONSTRAINT fk_rp_role FOREIGN KEY (roleId) REFERENCES role(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

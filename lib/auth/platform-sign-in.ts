@@ -58,7 +58,7 @@ export async function platformSignIn(
     if (!secret) throw new Error('AUTH_SESSION_SECRET missing');
     const token = createSessionToken(verified.userId, verified.role);
     return { success: true, sessionToken: token, role: verified.role, requestId };
-  } catch (e) {
+  } catch (_e) {
     // Never leak internal details (no error.message to client)
     return { success: false, error: 'An error occurred.', requestId };
   }

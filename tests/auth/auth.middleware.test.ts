@@ -1,19 +1,20 @@
 import { describe, it, expect } from 'vitest';
-import { denyByDefault, requireAuthGuard, requireExactRole, type RoleFamily, type Scope } from '@/lib/authorization/authorization';
+import type { AuthContext, Scope, RoleFamily } from '@/lib/authorization/authorization';
+import { denyByDefault, requireAuthGuard, requireExactRole } from '@/lib/authorization/authorization';
 
-const staffCtx = {
+const staffCtx: AuthContext = {
   userId: 'usr-001',
   role: 'claims_officer',
   scope: 'assigned' as Scope,
   requestId: 'req-test-01',
 };
 
-const adminCtx = { ...staffCtx, role: 'admin', scope: 'global' as Scope };
+const adminCtx: AuthContext = { ...staffCtx, role: 'admin', scope: 'global' as Scope };
 
 describe('denyByDefault RBAC', () => {
   it('denies missing context', () => {
-    expect(denyByDefault(null as any, 'admin', 'global')).toBe(false);
-    expect(denyByDefault({ userId: '', role: '', scope: 'global' } as any, 'admin', 'global')).toBe(false);
+    expect(denyByDefault(null as unknown as AuthContext, 'admin', 'global')).toBe(false);
+    expect(denyByDefault({ userId: '', role: '', scope: 'global' as Scope, requestId: 'r' }, 'admin', 'global')).toBe(false);
   });
 
   it('denies unknown role family', () => {
@@ -22,7 +23,7 @@ describe('denyByDefault RBAC', () => {
   });
 
   it('denies scope mismatch', () => {
-    const ctx = { ...adminCtx, scope: 'self' as const };
+    const ctx = { ...adminCtx, scope: 'self' as Scope };
     expect(denyByDefault(ctx, 'admin', 'branch')).toBe(false);
     expect(denyByDefault(ctx, 'admin', 'self')).toBe(true);
   });

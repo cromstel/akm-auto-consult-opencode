@@ -33,15 +33,17 @@ export function authGuard(requiredRole: RoleFamily, resourceScope: Scope = 'glob
       if (!m) {
         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
       }
-      const ctx = verifySessionToken(decodeURIComponent(m[1])) as AuthContext | null;
+      const ctx = verifySessionToken(decodeURIComponent(m[1]));
       if (!ctx) {
         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
       }
-      // Scope is derived from the role family (not stored in session token).
-      ctx.scope = ROLE_SCOPE_MAP[(ctx as any).role] ?? 'global';
-      ctx.requestId = req.headers.get('x-request-id') || crypto.randomUUID();
-      ctx.userId = (ctx as any).userId;
-      return denyByDefault(ctx, requiredRole, resourceScope) ? null : denyResponse();
+      const authCtx: AuthContext = {
+        userId: ctx.userId,
+        role: ctx.role,
+        scope: ROLE_SCOPE_MAP[ctx.role] ?? 'global',
+        requestId: req.headers.get('x-request-id') || crypto.randomUUID(),
+      };
+      return denyByDefault(authCtx, requiredRole, resourceScope) ? null : denyResponse();
     } catch {
       return denyResponse();
     }

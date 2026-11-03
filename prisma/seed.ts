@@ -131,7 +131,12 @@ async function main() {
     skipDuplicates: true,
   });
 
-  // 2) Persist roles (cleaned: drop permissions field as legacy column remains)
+  interface PermissionRoleMap {
+  name: string;
+  roleId: string;
+}
+
+// 2) Persist roles (cleaned: drop permissions field as legacy column remains)
   for (const role of ROLE_SEEDS) {
     await prisma.role.upsert({
       where: { name: role.name },
@@ -140,24 +145,24 @@ async function main() {
     });
   }
 
-  // Build lookup for roles
-  const roles = await prisma.role.findMany();
-  const roleMap = new Map(roles.map((r) => [r.id, r]));
+  // Build lookup for roles (by name, not id)
+  const roleNames: string[] = [];
+  for (const role of ROLE_SEEDS) roleNames.push(role.name);
+  const existingRoles = await prisma.role.findMany({ where: { name: { in: roleNames } } });
+  const roleMap = new Map(existingRoles.map((r) => [r.name, r.id]));
 
   // 3) Sync role_permissions links
-  const roleLinks = await prisma.rolePermission.deleteMany({ where: {} });
+  await prisma.rolePermission.deleteMany({});
   if (ROLE_PERMISSIONS.length > 0) {
     const permissions = await prisma.permission.findMany();
     const permByName = new Map(permissions.map((p) => [p.name, p]));
     await prisma.rolePermission.createMany({
       data: ROLE_PERMISSIONS.map(({ name, roleName }) => {
         const permission = permByName.get(name);
-        const role = roleMap.get(roleName);
-        return {
-          permissionId: permission!.id,
-          roleId: role!.id,
-        };
-      }),
+        const roleId = roleMap.get(roleName);
+        if (!permission || !roleId) return null;
+        return { permissionId: permission.id, roleId };
+      }).filter(Boolean) as any,
     });
   }
 

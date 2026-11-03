@@ -22,3 +22,4 @@ RBAC plus scope/attributes: role → permission; user → role assignment; permi
 
 ## Threats to test
 Account takeover, role escalation, tenant IDOR, claim state manipulation, malicious uploads, secret leakage, brute force, insider export abuse, injection/XSS/CSRF, availability abuse. Audit and access review.
+SECURITY RULE: No secret exposure in outputs. Rotate exposed .env.local secrets (AUTH_SESSION_SECRET, DATABASE_URL password) before deploy.

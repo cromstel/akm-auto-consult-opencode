@@ -20,14 +20,23 @@ export async function registerCustomer(email: string, password: string, fullName
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { success: false, error: 'Account exists' };
   const hash = await hashPassword(password);
-  const userData: any = { email, passwordHash: hash, role: 'customer', status: 'pending', verified: false, fullName: fullName || undefined, phone: phone || undefined, name: fullName || email };
+  const userData = { email, passwordHash: hash, role: 'customer', status: 'pending', verified: false, fullName: fullName || undefined, phone: phone || undefined, name: fullName || email };
   const user = await prisma.user.create({ data: userData });
-  const customerData: any = { userId: user.id, name: fullName || email, fullName: fullName || undefined, phone: phone || undefined, address: address || undefined, dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined, organization: organization || undefined, nationalIdNumber: nationalIdNumber || undefined };
+  const customerData = {
+    userId: user.id,
+    name: fullName || email,
+    fullName: fullName || undefined,
+    phone: phone || undefined,
+    address: address || undefined,
+    dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : undefined,
+    organization: organization || '',
+    nationalIdNumber: nationalIdNumber || undefined,
+  };
   await prisma.customer.create({ data: customerData });
   if (policyNumber) {
     const customerRec = await prisma.customer.findUnique({ where: { userId: user.id }, select: { id: true } });
     if (customerRec) {
-      await (prisma as any).policy.create({ data: { customerId: customerRec.id, policyNumber } });
+      await prisma.policy.create({ data: { customerId: customerRec.id, policyNumber } });
     }
   }
   return { success: true, userId: user.id };

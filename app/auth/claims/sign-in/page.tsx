@@ -11,7 +11,8 @@ export default function StaffClaimsSignInPage() {
     <div className="flex min-h-screen flex-col">
       <PortalHeader portal="staff" />
       <main aria-label="Staff claims sign in" className="mx-auto max-w-md flex-1 px-6 py-16">
-        <img src="/icon.svg" alt="AKM Logo" className="h-10 w-auto mb-4" />
+        // eslint-disable-next-line @next/next/no-img-element
+<img src="/icon.svg" alt="AKM Logo" className="h-10 w-auto mb-4" />
       <h1 className="mb-2 text-3xl font-extrabold tracking-tight">{appName}</h1>
         <h2 className="mb-6 text-xl font-semibold">Claims / Adjustments — staff sign in</h2>
         <p className="mb-4 text-sm text-muted-foreground">Restricted to staff/admin roles. Expected role validated server-side; mismatched roles denied generically.</p>
