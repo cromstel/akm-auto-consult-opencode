@@ -16,7 +16,6 @@ const prisma = new PrismaClient();
 interface RoleSeed {
   name: string;
   scope: string;
-  permissions: string;
 }
 
 // Permission strings align with docs/security/SECURITY_RBAC.md and the
@@ -55,7 +54,7 @@ const PERM_SEEDS: PermSeed[] = [
 ];
 
 const ROLE_SEEDS: RoleSeed[] = [
-  { name: 'public', scope: 'self', permissions: '' },
+  { name: 'public', scope: 'self' },
   { name: 'customer', scope: 'self' },
   { name: 'claims_officer', scope: 'assigned' },
   { name: 'adjuster', scope: 'assigned' },
@@ -126,10 +125,10 @@ const ROLE_PERMISSIONS: Array<{ name: string; roleName: string }> = [
 ];
 
 async function main() {
-  // 1) Persist permissions independently (upsert by name)
-  await prisma.permission.upsertMany({
-    where: {},
-    create: PERM_SEEDS.map((p) => ({ name: p.name, category: p.category, description: p.description })),
+  // 1) Persist permissions independently (createMany by unique name).
+  await prisma.permission.createMany({
+    data: PERM_SEEDS.map((p) => ({ name: p.name, category: p.category, description: p.description })),
+    skipDuplicates: true,
   });
 
   // 2) Persist roles (cleaned: drop permissions field as legacy column remains)
@@ -141,6 +140,10 @@ async function main() {
     });
   }
 
+  // Build lookup for roles
+  const roles = await prisma.role.findMany();
+  const roleMap = new Map(roles.map((r) => [r.id, r]));
+
   // 3) Sync role_permissions links
   const roleLinks = await prisma.rolePermission.deleteMany({ where: {} });
   if (ROLE_PERMISSIONS.length > 0) {
@@ -149,7 +152,7 @@ async function main() {
     await prisma.rolePermission.createMany({
       data: ROLE_PERMISSIONS.map(({ name, roleName }) => {
         const permission = permByName.get(name);
-        const role = roleByName.get(roleName);
+        const role = roleMap.get(roleName);
         return {
           permissionId: permission!.id,
           roleId: role!.id,

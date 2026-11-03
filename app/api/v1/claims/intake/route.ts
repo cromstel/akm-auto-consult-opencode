@@ -1,8 +1,13 @@
 import { NextResponse } from 'next/server';
-import { denyByDefault } from '@/lib/auth/auth.middleware';
+import { authGuard } from '@/lib/auth/auth.middleware';
+
+// Claim intake is a Phase 4 (M4) workflow endpoint. Deny-by-default: any
+// staff-family session with the claims officer role may create a claim.
+// Body validation with a Zod schema lands with the M4 workflow implementation.
+const guard = authGuard('claims_officer', 'global');
+
 export async function POST(req: Request) {
-  const deny = denyByDefault(req);
+  const deny = await guard(req);
   if (deny) return deny;
-  // Intention: claim intake (Phase 4); body validation omitted for brevity — add Zod schema next
   return NextResponse.json({ success: true, message: 'Claim intake endpoint ready (M4 follow-up)' });
 }

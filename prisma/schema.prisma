@@ -26,18 +26,18 @@ model User {
 }
 
 model Role {
-  id        String     @id @default(uuid())
-  name      String     @unique
-  scope     String
-  permissions Permission[]
-  createdAt  DateTime   @default(now())
+  id      String     @id @default(uuid())
+  name    String     @unique
+  scope   String
+  links   RolePermission[]
+  createdAt DateTime @default(now())
 }
 
 model Permission {
-  id           String   @id @default(uuid())
-  name         String   @unique // e.g. "customers.read"
-  category     String   // e.g. "customers", "claims", "staff", "settings"
-  description   String?
+  id           String    @id @default(uuid())
+  name         String    @unique
+  category     String
+  description  String?
   roles        RolePermission[]
 }
 

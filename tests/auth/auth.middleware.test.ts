@@ -1,15 +1,14 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import type { AuthContext } from '@/lib/authorization/authorization';
-import { denyByDefault, requireAuthGuard, requireExactRole } from '@/lib/authorization/authorization';
+import { describe, it, expect } from 'vitest';
+import { denyByDefault, requireAuthGuard, requireExactRole, type RoleFamily, type Scope } from '@/lib/authorization/authorization';
 
-const staffCtx: AuthContext = {
+const staffCtx = {
   userId: 'usr-001',
   role: 'claims_officer',
-  scope: 'assigned',
+  scope: 'assigned' as Scope,
   requestId: 'req-test-01',
 };
 
-const adminCtx: AuthContext = { ...staffCtx, role: 'admin', scope: 'global' };
+const adminCtx = { ...staffCtx, role: 'admin', scope: 'global' as Scope };
 
 describe('denyByDefault RBAC', () => {
   it('denies missing context', () => {
@@ -23,7 +22,7 @@ describe('denyByDefault RBAC', () => {
   });
 
   it('denies scope mismatch', () => {
-    const ctx = { ...adminCtx, scope: 'self' };
+    const ctx = { ...adminCtx, scope: 'self' as const };
     expect(denyByDefault(ctx, 'admin', 'branch')).toBe(false);
     expect(denyByDefault(ctx, 'admin', 'self')).toBe(true);
   });

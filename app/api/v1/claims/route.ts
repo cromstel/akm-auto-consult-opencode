@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { denyByDefault, type AuthContext, type Scope } from '@/lib/authorization/authorization';
+import { denyByDefault, type AuthContext, type Scope, type RoleFamily } from '@/lib/authorization/authorization';
 import { verifySessionToken } from '@/lib/auth/auth.service';
 import { listClaims } from '@/lib/repositories/claims';
 
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     requestId,
   };
 
-  if (!denyByDefault(ctx, payload.role, scope)) {
+  if (!denyByDefault(ctx, payload.role as RoleFamily, scope)) {
     return denied();
   }
 
