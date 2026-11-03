@@ -1,23 +1,27 @@
-import { PortalHeader } from '@/components/layout/portal-header';
-import { SiteFooter } from '@/components/layout/site-footer';
+import { cookies } from 'next/headers';
+import { verifySessionToken } from '@/lib/auth/auth.service';
+import { VehicleRepo } from '@/lib/db/vehicle.repository';
+import { CustomerCard } from '@/components/customer/Card';
 
-export default function CustomerVehiclesPage() {
+export default async function CustomerVehiclesPage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
+  const payload = session ? verifySessionToken(session) : null;
+  if (!payload || payload.role !== 'customer') return (<main aria-label="Vehicles" className="mx-auto max-w-3xl px-6 py-10"><h1 className="text-3xl font-extrabold">Vehicles</h1><p className="text-destructive">Not authorized.</p></main>);
+
+  const vehicles = await VehicleRepo.findByCustomerId(payload.userId, 'self');
   return (
-    <div className="flex min-h-screen flex-col">
-      <PortalHeader portal="customer" />
-      <main aria-label="Customer vehicles" className="mx-auto max-w-5xl flex-1 px-6 py-10">
-        <h2 className="mb-2 text-3xl font-extrabold tracking-tight">Vehicles</h2>
-        <p className="mb-6 text-muted-foreground">Insured vehicles on this account. Real records appear once the DB wiring lands.</p>
-        <section aria-label="Vehicle list (skeleton)" className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-          <h3 className="mb-2 text-lg font-semibold">Registered vehicles</h3>
-          <p className="text-sm text-muted-foreground">No vehicles registered yet.</p>
-        </section>
-        <aside aria-label="Access boundary" className="mt-6 rounded-xl border border-border bg-card/60 p-6">
-          <h3 className="mb-2 text-base font-semibold">Access boundary</h3>
-          <p className="text-sm text-muted-foreground">Only the account owner may view these records. Server-side authorization enforced.</p>
-        </aside>
-      </main>
-      <SiteFooter />
-    </div>
+    <main aria-label="Vehicles" className="mx-auto max-w-3xl px-6 py-10">
+      <h1 className="text-3xl font-extrabold tracking-tight mb-6">Vehicles</h1>
+      {vehicles.length === 0 ? (<p>No vehicles found.</p>) : (
+        <div className="grid gap-4">
+          {vehicles.map(v => (
+            <CustomerCard key={v.id} title={`${v.year} ${v.make} ${v.model}`}>
+              <p className="text-sm text-muted-foreground">VIN: {v.vin || '—'}</p>
+            </CustomerCard>
+          ))}
+        </div>
+      )}
+    </main>
   );
 }

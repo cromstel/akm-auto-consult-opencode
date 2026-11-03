@@ -6,9 +6,9 @@ import { registerCustomer } from '@/lib/auth/customer.actions';
 
 export default function CustomerRegisterPage() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div suppressHydrationWarning className="flex min-h-screen flex-col">
       <PortalHeader portal="customer" />
-      <main aria-label="Customer registration" className="mx-auto max-w-md flex-1 px-6 py-16">
+      <main suppressHydrationWarning aria-label="Customer registration" className="mx-auto max-w-md flex-1 px-6 py-16">
         <h1 className="mb-2 text-3xl font-extrabold tracking-tight">{getAppName()}</h1>
         <h2 className="mb-6 text-xl font-semibold">Customer register</h2>
         <p className="mb-4 text-sm text-muted-foreground">Public registration creates customer accounts only. Staff/admin accounts are provisioned by authorized management.</p>

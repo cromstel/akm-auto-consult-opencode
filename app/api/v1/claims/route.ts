@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
     requestId,
   };
 
-  if (!denyByDefault(ctx, payload.role as RoleFamily, scope)) {
+  if (!denyByDefault(ctx, payload.role as unknown as RoleFamily, scope)) {
     return denied();
   }
 

@@ -1,1 +1,31 @@
-'use client'; import { useEffect, useState } from 'react'; import { SiteFooter } from '@/components/layout/site-footer'; import { EvidenceUploadForm } from '@/components/evidence/evidence-upload-form'; interface ClaimRow { id: string; claimNumber: string; status: string; priority: string; vehicleId: string; createdAt: string; } const STATUS_LABELS: Record<string, string> = { submitted: 'Submitted', assigned: 'Assigned', inspected: 'Inspected', estimated: 'Estimated', approved: 'Approved', resolved: 'Resolved', }; export default function CustomerClaimsPage() { const [claims, setClaims] = useState<ClaimRow[]>([]); const [loading, setLoading] = useState(true); const [error, setError] = useState<string | null>(null); const [selectedClaimId, setSelectedClaimId] = useState<string | null>(null); useEffect(() => { let cancelled = false; fetch('/api/v1/claims') .then((res) => { if (!res.ok) throw new Error('fetch failed'); return res.json(); }) .then((data) => { if (!cancelled) { setClaims(Array.isArray(data?.data) ? (data.data as ClaimRow[]) : []); setLoading(false); } }) .catch(() => { if (!cancelled) { setError('Failed to load claims. Try again later.'); setLoading(false); } }); return () => { cancelled = true; }; }, []); return ( <div className="flex min-h-screen flex-col"> <main aria-label="Customer claims" className="mx-auto max-w-5xl flex-1 px-6 py-10"> <h2 className="mb-2 text-3xl font-extrabold tracking-tight">Claims</h2> <p className="text-muted-foreground mb-6">Submit new claims, track existing ones. Evidence images uploaded via AVIF pipeline when fixtures delivered.</p> {loading && <p className="text-sm text-muted-foreground">Loading claims…</p>} {error && <p role="alert" className=" border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">{error}</p>} {!loading && !error && claims.length === 0 && ( <section aria-label="No claims" className=" border border-border bg-card p-6 shadow-sm"> <h3 className="mb-1 text-lg font-semibold">No active claims</h3> <p className="text-sm text-muted-foreground">When fixtures arrive, claims will appear here.</p> </section> )} <div className="grid gap-6 md:grid-cols-3"> <section aria-label="Claim cards" className="md:col-span-2 border border-border bg-card p-6 shadow-sm"> <h3 className="mb-4 text-lg font-semibold">Active claims ({claims.length})</h3> <ul className="space-y-3"> {claims.map((c) => ( <li key={c.id} className="flex items-center justify-between border border-border bg-background/40 px-4 py-3"> <div> <p className="font-medium text-sm">{c.claimNumber}</p> <p className="mt-0.5 text-xs text-muted-foreground">{STATUS_LABELS[c.status] ?? c.status} · {c.priority} · {c.createdAt.slice(0, 10)}</p> </div> <button type="button" onClick={() => setSelectedClaimId((prev) => (prev === c.id ? null : c.id))} className=" border border-border px-3 py-1.5 text-xs font-medium hover:bg-primary/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary" aria-expanded={selectedClaimId === c.id} > {selectedClaimId === c.id ? 'Hide evidence' : 'Upload evidence'} </button> </li> ))} </ul> </section> <section aria-label="Evidence uploads" className=" border border-border bg-card p-6 shadow-sm"> <h3 className="mb-3 text-lg font-semibold">Evidence uploads</h3> <p className="mb-4 text-xs text-muted-foreground">Only for your own claims. AVIF pipeline processes on server.</p> {selectedClaimId ? ( <EvidenceUploadForm claimId={selectedClaimId} /> ) : ( <p className="text-sm text-muted-foreground">Select a claim above to upload evidence.</p> )} </section> </div> <aside aria-label="Access boundary" className="mt-6 border border-border bg-card/60 p-6"> <h3 className="mb-2 text-base font-semibold">Access boundary</h3> <p className="text-sm text-muted-foreground">Only the account owner and assigned staff may view/update these claims. Server-side authorization enforced; no role from form.</p> </aside> </main> <SiteFooter /> </div> ); } 
+import { cookies } from 'next/headers';
+import { verifySessionToken } from '@/lib/auth/auth.service';
+import { CustomerRepo } from '@/lib/db/customer.repository';
+import { ClaimRepo } from '@/lib/db/claim.repository';
+import { CustomerCard } from '@/components/customer/Card';
+
+export default async function CustomerClaimsPage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get('session')?.value;
+  const payload = session ? verifySessionToken(session) : null;
+  if (!payload || payload.role !== 'customer') return (<main aria-label="Claims" className="mx-auto max-w-3xl px-6 py-10"><h1 className="text-3xl font-extrabold">Claims</h1><p className="text-destructive">Not authorized.</p></main>);
+
+  const customer = await CustomerRepo.findByUserId(payload.userId);
+  if (!customer) return (<main aria-label="Claims" className="mx-auto max-w-3xl px-6 py-10"><h1 className="text-3xl font-extrabold">Claims</h1><p>No claims found.</p></main>);
+
+  const claims = await ClaimRepo.findByCustomerId(payload.userId, 'self');
+  return (
+    <main aria-label="Claims" className="mx-auto max-w-3xl px-6 py-10">
+      <h1 className="text-3xl font-extrabold tracking-tight mb-6">Your Claims</h1>
+      {claims.length === 0 ? (<p>No claims yet.</p>) : (
+        <div className="space-y-4">
+          {claims.map(c => (
+            <CustomerCard key={c.id} title={c.claimNumber}>
+              <dl className="grid grid-cols-2 gap-4 text-sm"><dt>Status</dt><dd>{c.status}</dd><dt>Vehicle</dt><dd>{c.vehicle?.make} {c.vehicle?.model}</dd><dt>Priority</dt><dd>{c.priority}</dd></dl>
+            </CustomerCard>
+          ))}
+        </div>
+      )}
+    </main>
+  );
+}

@@ -35,7 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icon.svg" />
       </head>
-      <body className="flex min-h-screen flex-col bg-background text-foreground antialiased">
+      <body suppressHydrationWarning className="flex min-h-screen flex-col bg-background text-foreground antialiased">
         {children}
       </body>
     </html>

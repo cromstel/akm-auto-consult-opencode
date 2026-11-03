@@ -9,6 +9,9 @@
 /.next/
 /out/
 
+# Opencode Plan Files
+.opencode/
+
 # production
 .env.*
 /.env*.local
@@ -24,6 +27,11 @@
 *.sql
 *.dump
 *.key
+*.out
+*.err
+*.log
+*.txt
+
 
 # exception: Prisma migrations are version-controlled source
 !prisma/migrations/**/*.sql
