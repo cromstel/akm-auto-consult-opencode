@@ -46,3 +46,26 @@
 
 # Deployment package artifacts (rebuildable; zip is for manual upload only)
 /deploy/
+
+# Project docs & artifacts (untracked)
+/AGENTS.md
+/MEMORY.md
+/PRD.md
+/TODO.md
+/WIKI.md
+/PROMPT.md
+/M2-MIDDLEWARE-WIRE.md
+/executive-summary.md
+/localhost-deploy-verify.md
+/localhost-deploy.log
+/pyedit.py
+/scripts/build-ico.js
+/test_echo2.txt
+/tmp_write.ps1
+/.claude/
+/docs/
+/tests/
+/thoughts/
+/dev.err
+/dev.out
+

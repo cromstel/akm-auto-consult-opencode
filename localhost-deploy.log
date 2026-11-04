@@ -1,6 +1,0 @@
-LOCALHOST DEPLOY LOG (not committed; masked DB URL; NOT production)
-Target: 127.0.0.1:3000
-DB: 127.0.0.1:3306 (local dev DB — masked connection; NOT prod host srvNNNN)
-Status: server started in background; smoke checks reference-only
-Rollback: docs/DEPLOYMENT.md
-Secrets: none in log
